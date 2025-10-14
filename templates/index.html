@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBC Counter - White Blood Cell Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 White Blood Cell Counter</h1>
+            <p>Upload an image to detect and count white blood cells</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-box" id="uploadBox">
+                <input type="file" id="fileInput" accept="image/*" hidden>
+                <div class="upload-content">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p class="upload-text">Click to upload or drag and drop</p>
+                    <p class="upload-hint">PNG, JPG, JPEG, BMP, TIFF (MAX. 16MB)</p>
+                </div>
+            </div>
+
+            <button id="processBtn" class="btn-process" disabled>Process Image</button>
+        </div>
+
+        <div id="loader" class="loader" style="display: none;">
+            <div class="spinner"></div>
+            <p>Processing image...</p>
+        </div>
+
+        <div id="results" class="results" style="display: none;">
+            <h2>Results</h2>
+            <div class="results-grid">
+                <div class="result-item">
+                    <h3>Original Image</h3>
+                    <img id="originalImg" src="" alt="Original">
+                </div>
+                <div class="result-item">
+                    <h3>Processed Image</h3>
+                    <img id="processedImg" src="" alt="Processed">
+                </div>
+            </div>
+            <div class="count-result">
+                <h3>White Blood Cell Count: <span id="cellCount">0</span></h3>
+            </div>
+            <button id="resetBtn" class="btn-reset">Upload Another Image</button>
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -9,13 +9,16 @@ app = Flask(__name__)
 app.config.from_object(Config)
 Config.init_app(app)
 
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -23,7 +26,6 @@ def upload_file():
         return jsonify({'error': 'No file provided'}), 400
 
     file = request.files['file']
-
     if file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
 
@@ -39,7 +41,6 @@ def upload_file():
 
         final_mask, count = detect_and_count(image)
 
-       
         result_filename = f'processed_{filename}'
         result_path = os.path.join(app.config['RESULTS_FOLDER'], result_filename)
         cv2.imwrite(result_path, final_mask)
@@ -48,12 +49,13 @@ def upload_file():
             'success': True,
             'original': url_for('static', filename=f'uploads/{filename}'),
             'processed': url_for('static', filename=f'uploads/results/{result_filename}'),
-            'count': int(count) 
+            'count': int(count)
         })
 
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

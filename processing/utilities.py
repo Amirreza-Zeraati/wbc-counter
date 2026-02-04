@@ -154,6 +154,3 @@ def filter_and_count_manual(binary_img, min_area=80):
 
     return count, final_mask
 
-# Usage in your pipeline:
-# count, clean_binary = filter_and_count_manual(noisy_binary, min_area=80)
-

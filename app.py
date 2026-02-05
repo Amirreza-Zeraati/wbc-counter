@@ -4,9 +4,9 @@ from werkzeug.utils import secure_filename
 from processing.detector import detect_and_count
 from flask import Flask, render_template, request, jsonify, url_for
 
+
 class Config:
     SECRET_KEY = 'cats'
-    # Use absolute paths or relative to the current working directory safely
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
     RESULTS_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads', 'results')
@@ -18,17 +18,21 @@ class Config:
         os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
         os.makedirs(Config.RESULTS_FOLDER, exist_ok=True)
 
+
 app = Flask(__name__)
 app.config.from_object(Config)
 Config.init_app(app)
+
 
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -47,10 +51,7 @@ def upload_file():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
 
-        # Read image
         image = cv2.imread(filepath)
-        
-        # Process image using pure python/BFS logic
         final_mask, count = detect_and_count(image)
 
         result_filename = f'processed_{filename}'
@@ -67,6 +68,7 @@ def upload_file():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

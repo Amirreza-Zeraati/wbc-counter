@@ -111,10 +111,11 @@ def filter_and_count_manual(binary_img, min_area=80):
     """
     rows, cols = binary_img.shape
     visited = np.zeros((rows, cols), dtype=bool)
-    final_mask = np.zeros((rows, cols), dtype=np.uint8)
+    final_mask = np.zeros((rows, cols), dtype=np.uint8)  # The "Clean" image
 
     count = 0
 
+    # Standard BFS directions (8-connectivity)
     directions = [(-1, -1), (-1, 0), (-1, 1),
                   (0, -1), (0, 1),
                   (1, -1), (1, 0), (1, 1)]
@@ -122,11 +123,13 @@ def filter_and_count_manual(binary_img, min_area=80):
     for r in range(rows):
         for c in range(cols):
             if binary_img[r, c] == 255 and not visited[r, c]:
-                component_pixels = []
+                # --- New Component Found ---
+                component_pixels = []  # Store coordinates to "draw" later
                 q = deque([(r, c)])
                 visited[r, c] = True
                 component_pixels.append((r, c))
 
+                # Run BFS to find the whole object
                 while q:
                     curr_r, curr_c = q.popleft()
 
@@ -139,97 +142,18 @@ def filter_and_count_manual(binary_img, min_area=80):
                                 q.append((nr, nc))
                                 component_pixels.append((nr, nc))
 
+                # --- Filter Logic (The replacement for contourArea > 80) ---
                 area = len(component_pixels)
 
                 if area > min_area:
                     count += 1
+                    # "Draw" the object onto the final mask
+                    # This replaces cv2.drawContours(final_mask, ...)
                     for (pr, pc) in component_pixels:
                         final_mask[pr, pc] = 255
 
     return count, final_mask
 
+# Usage in your pipeline:
+# count, clean_binary = filter_and_count_manual(noisy_binary, min_area=80)
 
-def find_cell_centers_and_radii(binary_img, dist_transform, min_area=80):
-    """
-    Find cell centers using BFS on the binary markers image.
-    For each cell, calculate its center and approximate radius using distance transform.
-    
-    Args:
-        binary_img: Binary image with cell markers (peaks from distance transform)
-        dist_transform: Distance transform of the original mask
-        min_area: Minimum area to consider as a valid cell
-    
-    Returns:
-        cell_centers: List of (row, col) tuples representing cell centers
-        cell_radii: List of radii for each cell
-    """
-    rows, cols = binary_img.shape
-    visited = np.zeros((rows, cols), dtype=bool)
-    
-    cell_centers = []
-    cell_radii = []
-    
-    directions = [(-1, -1), (-1, 0), (-1, 1),
-                  (0, -1), (0, 1),
-                  (1, -1), (1, 0), (1, 1)]
-    
-    for r in range(rows):
-        for c in range(cols):
-            if binary_img[r, c] == 255 and not visited[r, c]:
-                component_pixels = []
-                q = deque([(r, c)])
-                visited[r, c] = True
-                component_pixels.append((r, c))
-                
-                while q:
-                    curr_r, curr_c = q.popleft()
-                    
-                    for dr, dc in directions:
-                        nr, nc = curr_r + dr, curr_c + dc
-                        
-                        if 0 <= nr < rows and 0 <= nc < cols:
-                            if binary_img[nr, nc] == 255 and not visited[nr, nc]:
-                                visited[nr, nc] = True
-                                q.append((nr, nc))
-                                component_pixels.append((nr, nc))
-                
-                area = len(component_pixels)
-                
-                if area > min_area:
-                    # Calculate centroid
-                    sum_r = sum(p[0] for p in component_pixels)
-                    sum_c = sum(p[1] for p in component_pixels)
-                    center_r = sum_r // len(component_pixels)
-                    center_c = sum_c // len(component_pixels)
-                    
-                    # Get radius from distance transform at center
-                    # Add scaling factor to make cells more visible
-                    radius = int(dist_transform[center_r, center_c] * 1.5)
-                    radius = max(radius, 8)  # Minimum radius
-                    
-                    cell_centers.append((center_r, center_c))
-                    cell_radii.append(radius)
-    
-    return cell_centers, cell_radii
-
-
-def draw_filled_circle(img, cy, cx, radius):
-    """
-    Draw a filled circle on the image using pure Python (no OpenCV).
-    Uses midpoint circle algorithm with scanline filling.
-    
-    Args:
-        img: Image array to draw on (modified in place)
-        cy: Circle center Y coordinate (row)
-        cx: Circle center X coordinate (column)
-        radius: Circle radius
-    """
-    rows, cols = img.shape
-    
-    # Simple approach: iterate over bounding box and check distance
-    for r in range(max(0, cy - radius), min(rows, cy + radius + 1)):
-        for c in range(max(0, cx - radius), min(cols, cx + radius + 1)):
-            # Calculate distance from center
-            dist_sq = (r - cy) ** 2 + (c - cx) ** 2
-            if dist_sq <= radius ** 2:
-                img[r, c] = 255

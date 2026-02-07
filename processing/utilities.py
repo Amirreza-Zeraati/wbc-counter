@@ -103,19 +103,11 @@ def count_objects_manual(binary_img, min_area=50):
 
 
 def filter_and_count_manual(binary_img, min_area=80):
-    """
-    1. Finds connected components (WBC candidates).
-    2. Calculates their area.
-    3. If area > min_area: Keeps them in 'final_mask' and counts them.
-    4. If area <= min_area: Ignores them (effectively removing noise).
-    """
     rows, cols = binary_img.shape
     visited = np.zeros((rows, cols), dtype=bool)
-    final_mask = np.zeros((rows, cols), dtype=np.uint8)  # The "Clean" image
-
+    final_mask = np.zeros((rows, cols), dtype=np.uint8)
     count = 0
 
-    # Standard BFS directions (8-connectivity)
     directions = [(-1, -1), (-1, 0), (-1, 1),
                   (0, -1), (0, 1),
                   (1, -1), (1, 0), (1, 1)]
@@ -123,37 +115,22 @@ def filter_and_count_manual(binary_img, min_area=80):
     for r in range(rows):
         for c in range(cols):
             if binary_img[r, c] == 255 and not visited[r, c]:
-                # --- New Component Found ---
-                component_pixels = []  # Store coordinates to "draw" later
+                component_pixels = []
                 q = deque([(r, c)])
                 visited[r, c] = True
                 component_pixels.append((r, c))
-
-                # Run BFS to find the whole object
                 while q:
                     curr_r, curr_c = q.popleft()
-
                     for dr, dc in directions:
                         nr, nc = curr_r + dr, curr_c + dc
-
                         if 0 <= nr < rows and 0 <= nc < cols:
                             if binary_img[nr, nc] == 255 and not visited[nr, nc]:
                                 visited[nr, nc] = True
                                 q.append((nr, nc))
                                 component_pixels.append((nr, nc))
-
-                # --- Filter Logic (The replacement for contourArea > 80) ---
                 area = len(component_pixels)
-
                 if area > min_area:
                     count += 1
-                    # "Draw" the object onto the final mask
-                    # This replaces cv2.drawContours(final_mask, ...)
                     for (pr, pc) in component_pixels:
                         final_mask[pr, pc] = 255
-
     return count, final_mask
-
-# Usage in your pipeline:
-# count, clean_binary = filter_and_count_manual(noisy_binary, min_area=80)
-

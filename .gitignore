@@ -3,6 +3,7 @@ node_modules
 /dist
 static/uploads
 dataset
+batches
 
 # local env files
 .env.local

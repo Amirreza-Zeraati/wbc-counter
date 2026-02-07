@@ -1,5 +1,7 @@
 import os
 import cv2
+import random
+import numpy as np
 from werkzeug.utils import secure_filename
 from processing.detector import detect_and_count
 from flask import Flask, render_template, request, jsonify, url_for
@@ -38,11 +40,9 @@ def index():
 def upload_file():
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
-
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
-
     if not allowed_file(file.filename):
         return jsonify({'error': 'Invalid file type'}), 400
 

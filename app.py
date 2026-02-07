@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, jsonify, url_for
 
 
 class Config:
-    SECRET_KEY = 'cats'
+    SECRET_KEY = 'hsu'
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
     RESULTS_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads', 'results')
@@ -14,14 +14,14 @@ class Config:
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'tiff'}
 
     @staticmethod
-    def init_app(app):
+    def init_app():
         os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
         os.makedirs(Config.RESULTS_FOLDER, exist_ok=True)
 
 
 app = Flask(__name__)
 app.config.from_object(Config)
-Config.init_app(app)
+Config.init_app()
 
 
 def allowed_file(filename):

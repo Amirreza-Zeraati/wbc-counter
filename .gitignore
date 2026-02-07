@@ -2,6 +2,7 @@
 node_modules
 /dist
 static/uploads
+dataset
 
 # local env files
 .env.local

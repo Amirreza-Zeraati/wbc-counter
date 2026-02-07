@@ -5,8 +5,8 @@ import processing.utilities as filters
 
 def _segment_method3(image, min_contour_area=80):
     channel = filters.extract_channels(image, channel='s')
-    median = cv2.medianBlur(channel, 5)
-    _, binary = cv2.threshold(median, 90, 255, cv2.THRESH_BINARY)
+    median = filters.median_blur(channel, kernel_size=5)
+    binary = filters.threshold(median, threshold_value=90)
 
     kernel = np.ones((3, 3), np.uint8)
     mask = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel, iterations=2)

@@ -69,39 +69,6 @@ def threshold(img, threshold_value=127):
     return binary_img
 
 
-def count_objects_manual(binary_img, min_area=50):
-    rows, cols = binary_img.shape
-    visited = np.zeros((rows, cols), dtype=bool)
-
-    wbc_count = 0
-    component_stats = []
-    neighbors = [(-1, -1), (-1, 0), (-1, 1),
-                 (0, -1), (0, 1),
-                 (1, -1), (1, 0), (1, 1)]
-
-    for r in range(rows):
-        for c in range(cols):
-            if binary_img[r, c] == 255 and not visited[r, c]:
-                q = deque([(r, c)])
-                visited[r, c] = True
-                current_area = 0
-
-                while q:
-                    curr_r, curr_c = q.popleft()
-                    current_area += 1
-                    for dr, dc in neighbors:
-                        nr, nc = curr_r + dr, curr_c + dc
-                        if 0 <= nr < rows and 0 <= nc < cols:
-                            if binary_img[nr, nc] == 255 and not visited[nr, nc]:
-                                visited[nr, nc] = True
-                                q.append((nr, nc))
-
-                if current_area >= min_area:
-                    wbc_count += 1
-                    component_stats.append(current_area)
-    return wbc_count, component_stats
-
-
 def filter_and_count_manual(binary_img, min_area=80):
     rows, cols = binary_img.shape
     visited = np.zeros((rows, cols), dtype=bool)

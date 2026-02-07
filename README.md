@@ -2,10 +2,8 @@
 
 A Flask-based web application for automated detection and counting of White Blood Cells (WBC) in microscopic blood smear images. This project implements custom image processing algorithms in pure Python, focusing on algorithmic understanding over library dependency.
 
-![WBC Counter Demo](static/demo_preview.png)
-*(Note: Add a screenshot of your app here if available)*
 
-## 🚀 Features
+## Features
 
 - **Automated Counting**: Detects and counts WBCs from raw microscopic images.
 - **Adherent Cell Separation**: Uses Advanced Watershed segmentation to accurately separate touching/connected cells.
@@ -13,13 +11,13 @@ A Flask-based web application for automated detection and counting of White Bloo
 - **Web Interface**: Simple and intuitive UI for uploading images and viewing results side-by-side.
 - **Batch Processing**: Script included for processing entire datasets automatically.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend**: Python, Flask
 - **Image Processing**: OpenCV (for I/O & complex morphology), NumPy (matrix operations)
 - **Frontend**: HTML, CSS (Bootstrap)
 
-## 🧩 How It Works (The Pipeline)
+## How It Works (The Pipeline)
 
 The system processes images in three main phases:
 
@@ -29,7 +27,7 @@ The system processes images in three main phases:
 - **Custom Thresholding**: Converts the image to binary (Black & White).
 - **Morphological Cleanup**: Uses Opening/Closing to remove small artifacts and fill holes.
 
-### 2. Segmentation (Method 3)
+### 2. Segmentation (Gradient)
 To handle cells that are stuck together:
 - **Gradient Subtraction**: Highlights cell centers.
 - **Distance Transform**: Calculates the distance of pixels from the background, creating "peaks" at cell centers.
@@ -40,12 +38,12 @@ To handle cells that are stuck together:
 - **Custom BFS Algorithm**: A manual Breadth-First Search implementation scans the segmented image to identify and count distinct connected components.
 - **Area Filtering**: Ignores particles smaller than a set threshold (e.g., 80px) to prevent false positives.
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 wbc-counter/
 ├── app.py                  # Main Flask application
-├── batch_process.py        # Script for processing multiple images
+├── batch_processing.py        # Script for processing multiple images
 ├── processing/
 │   ├── detector.py         # Main segmentation pipeline (Method 3)
 │   └── utilities.py        # Custom pure-Python algo implementations (BFS, Blur, etc.)
@@ -54,7 +52,7 @@ wbc-counter/
 └── dataset/                # Folder for input images (for batch processing)
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Python 3.8+
@@ -88,10 +86,6 @@ To process all images in the `dataset/` folder:
 ```bash
 python batch_process.py
 ```
-Results will be saved in `batch_results/`.
+Results will be saved in `batches/`.
 
-## 🤝 Contributing
-Contributions are welcome! Please fork the repository and submit a pull request.
-
-## 📜 License
-This project is open-source and available for educational use.
+---

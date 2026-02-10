@@ -4,6 +4,8 @@ node_modules
 static/uploads
 dataset
 batches
+morph_comparison
+debug_steps
 
 # local env files
 .env.local

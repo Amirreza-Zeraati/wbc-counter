@@ -1,7 +1,5 @@
 import os
 import cv2
-import random
-import numpy as np
 from werkzeug.utils import secure_filename
 from processing.detector import detect_and_count
 from flask import Flask, render_template, request, jsonify, url_for
